@@ -1,20 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-d3.json("./shapefiles/metro_cities.json", function(error, metro) {
-d3.json("./shapefiles/counties.json", function(error, counties) {
-d3.json("./shapefiles/metro_landuse.json", function(error, land) {
-
-d3.json('./data/metro_populations.json', function(error, dataLoad) {
-d3.json("./data/metro_demographics.json", function(error, dataLoadDemo) {
-d3.json("./data/metro_land_use.json", function(error, dataLoadLand) {
-
-d3.json('./data/counties_populations.json', function(error, dataLoadCounties) {
-d3.json("./data/counties_demographics.json", function(error, dataLoadCountiesDemo) {
-d3.json("./data/counties_land_use.json", function(error, dataLoadCountiesLand) {
-
-d3.json('./data/all_populations.json', function(error, dataLoadAll) {
-d3.json("./data/all_demographics.json", function(error, dataLoadAllDemo) {
-d3.json("./data/all_land_use.json", function(error, dataLoadAllLand) {
-
 $.urlParam = function(name){
   var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
   if (results != null) { return results[1] || 0; }
@@ -27,6 +11,23 @@ if (selected != null){
 $(".slide").hide();
 $("#" + selected).show();
 }
+
+if (selected == "growth") {
+d3.json("./shapefiles/metro_cities.json", function(error, metro) {
+d3.json("./shapefiles/metro_tracts.json", function(error, population) {
+d3.json("./shapefiles/metro_tracts_1970.json", function(error, population1970) {
+
+d3.json('./data/metro_populations.json', function(error, dataLoad) {
+d3.json("./data/metro_demographics.json", function(error, dataLoadDemo) {
+d3.json("./data/metro_land_use.json", function(error, dataLoadLand) {
+
+d3.json('./data/counties_populations.json', function(error, dataLoadCounties) {
+d3.json("./data/counties_demographics.json", function(error, dataLoadCountiesDemo) {
+d3.json("./data/counties_land_use.json", function(error, dataLoadCountiesLand) {
+
+d3.json('./data/all_populations.json', function(error, dataLoadAll) {
+d3.json("./data/all_demographics.json", function(error, dataLoadAllDemo) {
+d3.json("./data/all_land_use.json", function(error, dataLoadAllLand) {
 
 $("#districtSelect").click(function() { 
   $("#listing").slideToggle();
@@ -51,7 +52,7 @@ d3.select("#all").selectAll(".row")
   .attr("class",function(d) { if (d.REGION_NAME == "Twin Cities Region (7-county)") { return "row selected" } else { return "row "; } })
   .attr("id",function(d) { if (d.REGION_NAME == "Twin Cities Region (7-county)") { return "first" } else { return null; } })
   .attr("type","all")
-  .attr("zoom",7)
+  .attr("zoom",9)
   .on("mousedown",function(d) {
 
     var pop = d3.format(",")(dataAll[18].POPULATION);
@@ -72,7 +73,7 @@ d3.select("#all").selectAll(".row")
     }
 
     for (var i=0; i < dataAllLand.length; i++){
-        if (dataAllLand[i].YEAR == 2010 && (dataAllLand[i].LAND_USE_DESCRIPTION == "Non-Urbanized" || dataAllLand[i].LAND_USE_DESCRIPTION == "Institutional and Recreation" || dataAllLand[i].LAND_USE_DESCRIPTION == "Open Water Bodies" || dataAllLand[i].LAND_USE_DESCRIPTION == "Parks & Recreation Areas" || dataAllLand[i].LAND_USE_DESCRIPTION == "Vacant/Agricultural" || dataAllLand[i].LAND_USE_DESCRIPTION == "Industrial Parks not Developed" || dataAllLand[i].LAND_USE_DESCRIPTION == "Public & Semi-Public Vacant" || dataAllLand[i].LAND_USE_DESCRIPTION == "Agriculture" || dataAllLand[i].LAND_USE_DESCRIPTION == "Park, Recreational or Preserve" || dataAllLand[i].LAND_USE_DESCRIPTION == "Golf Course" || dataAllLand[i].LAND_USE_DESCRIPTION == "Undeveloped Land" || dataAllLand[i].LAND_USE_DESCRIPTION == "Open Water")) { land += dataAllLand[i].ACRES; }
+        if (dataAllLand[i].YEAR == 2010 && (dataAllLand[i].LAND_USE_DESCRIPTION != "Non-Urbanized" && dataAllLand[i].LAND_USE_DESCRIPTION != "Institutional and Recreation" && dataAllLand[i].LAND_USE_DESCRIPTION != "Open Water Bodies" && dataAllLand[i].LAND_USE_DESCRIPTION != "Parks & Recreation Areas" && dataAllLand[i].LAND_USE_DESCRIPTION != "Vacant/Agricultural" && dataAllLand[i].LAND_USE_DESCRIPTION != "Industrial Parks not Developed" && dataAllLand[i].LAND_USE_DESCRIPTION != "Public & Semi-Public Vacant" && dataAllLand[i].LAND_USE_DESCRIPTION != "Agriculture" && dataAllLand[i].LAND_USE_DESCRIPTION != "Park, Recreational or Preserve" && dataAllLand[i].LAND_USE_DESCRIPTION != "Golf Course" && dataAllLand[i].LAND_USE_DESCRIPTION != "Undeveloped Land" && dataAllLand[i].LAND_USE_DESCRIPTION != "Open Water")) { land += dataAllLand[i].ACRES; }
     }
 
     $("#population").html(pop);
@@ -94,7 +95,7 @@ d3.select("#counties").selectAll(".row")
   .attr("class",function(d) { return "row "; })
   // .attr("id",function(d) { if (d.CO_NAME == "Anoka County") { return "first" } else { return null; } })
   .attr("type","county")
-  .attr("zoom",9)
+  .attr("zoom",8)
   .on("mousedown",function(d) {
 
     var pop;
@@ -374,9 +375,9 @@ $(".row").click(function() {
         });
  
 // LAND USE CHART
-  var landDataNU = dataAllLand.filter(function(d){ return d.LAND_USE_DESCRIPTION == "Non-Urbanized" || d.LAND_USE_DESCRIPTION == "Institutional and Recreation" || d.LAND_USE_DESCRIPTION == "Open Water Bodies" || d.LAND_USE_DESCRIPTION == "Parks & Recreation Areas" || d.LAND_USE_DESCRIPTION == "Vacant/Agricultural" || d.LAND_USE_DESCRIPTION == "Industrial Parks not Developed" || d.LAND_USE_DESCRIPTION == "Public & Semi-Public Vacant" || d.LAND_USE_DESCRIPTION == "Agriculture" || d.LAND_USE_DESCRIPTION == "Park, Recreational or Preserve" || d.LAND_USE_DESCRIPTION == "Golf Course" || d.LAND_USE_DESCRIPTION == "Undeveloped Land" || d.LAND_USE_DESCRIPTION == "Open Water";  })
+  var landDataNU = dataAllLand.filter(function(d){ return d.LAND_USE_DESCRIPTION != "Non-Urbanized" && d.LAND_USE_DESCRIPTION != "Institutional and Recreation" && d.LAND_USE_DESCRIPTION != "Open Water Bodies" && d.LAND_USE_DESCRIPTION != "Parks & Recreation Areas" && d.LAND_USE_DESCRIPTION != "Vacant/Agricultural" && d.LAND_USE_DESCRIPTION != "Industrial Parks not Developed" && d.LAND_USE_DESCRIPTION != "Public & Semi-Public Vacant" && d.LAND_USE_DESCRIPTION != "Agriculture" && d.LAND_USE_DESCRIPTION != "Park, Recreational or Preserve" && d.LAND_USE_DESCRIPTION != "Golf Course" && d.LAND_USE_DESCRIPTION != "Undeveloped Land" && d.LAND_USE_DESCRIPTION != "Open Water";  })
 
-  var landuseNU = ["Undeveloped Acres", 0,0,0,0,0];
+  var landuseNU = ["Developed Acres", 0,0,0,0,0];
   var landYears = ["x",1970,1980,1990,2000,2010];
 
   var indexThis = 1;
@@ -398,7 +399,7 @@ $(".row").click(function() {
                     landYears,
                     landuseNU
                 ],
-                colors: { 'Undeveloped Acres': '#333333' }
+                colors: { 'Developed Acres': '#333333' }
             },
             legend: {
                 show: false
@@ -551,8 +552,9 @@ $(".row").click(function() {
             },
             axis: {
                 y: {
+                    max: 0.60,
                     min: 0,
-                    padding: {bottom: 0, top: 10},
+                    padding: {bottom: 0, top: 0},
                     tick: {
                         count: 4,
                         format: d3.format('%')
@@ -652,7 +654,8 @@ if (dataType == "population"){
   if (pctChange < 0) { $("#populationChange").addClass("neg"); }
   else if (pctChange > 0) { $("#populationChange").addClass("pos"); }
 
-  $("#populationChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#populationChange").html(d3.format("+%")(pctChange)); }
+  else { $("#populationChange").html("--"); }
 
   if (values == "population") { return populations; }
   else if (values == "years") { return years; }
@@ -671,7 +674,7 @@ if (dataType == "income"){
           incomeYears[i+1] = incomeData[i].YEAR; 
     }
 
-  var pctChange = ((income[income.length-1] - income[1]) / income[1]);
+  var pctChange = ((income[income.length-2] - income[1]) / income[1]);
 
   $("#incomeChange").removeClass("pos");
   $("#incomeChange").removeClass("neg");
@@ -679,7 +682,8 @@ if (dataType == "income"){
   if (pctChange < 0) { $("#incomeChange").addClass("neg"); }
   else if (pctChange > 0) { $("#incomeChange").addClass("pos"); }
 
-  $("#incomeChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#incomeChange").html(d3.format("+%")(pctChange)); }
+  else { $("#incomeChange").html("--"); }
 
   if (values == "income") { return income; }
   else if (values == "years") { return incomeYears; }
@@ -706,7 +710,8 @@ if (dataType == "poverty"){
   if (pctChange < 0) { $("#povertyChange").addClass("neg"); }
   else if (pctChange > 0) { $("#povertyChange").addClass("pos"); }
 
-  $("#povertyChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#povertyChange").html(d3.format("+%")(pctChange)); }
+  else { $("#povertyChange").html("--"); }
 
   if (values == "poverty") { return poverty; }
   else if (values == "years") { return povYears; }
@@ -733,7 +738,8 @@ if (dataType == "degrees"){
   if (pctChange < 0) { $("#degreesChange").addClass("neg"); }
   else if (pctChange > 0) { $("#degreesChange").addClass("pos"); }
 
-  $("#degreesChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#degreesChange").html(d3.format("+%")(pctChange)); }
+  else { $("#degreesChange").html("--"); }
 
   if (values == "degrees") { return degrees; }
   else if (values == "years") { return degreeYears; }
@@ -760,16 +766,17 @@ if (dataType == "race"){
   if (pctChange < 0) { $("#raceChange").addClass("neg"); }
   else if (pctChange > 0) { $("#raceChange").addClass("pos"); }
 
-  $("#raceChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#raceChange").html(d3.format("+%")(pctChange)); }
+  else { $("#raceChange").html("--"); }
 
   if (values == "race") { return minorities; }
   else if (values == "years") { return raceYears; }
 }
 
 if (dataType == "land"){
-  var landData = dataLand.filter(function(d){ return d.CTU_NAME == city && (d.LAND_USE_DESCRIPTION == "Non-Urbanized" || d.LAND_USE_DESCRIPTION == "Institutional and Recreation" || d.LAND_USE_DESCRIPTION == "Open Water Bodies" || d.LAND_USE_DESCRIPTION == "Parks & Recreation Areas" || d.LAND_USE_DESCRIPTION == "Vacant/Agricultural" || d.LAND_USE_DESCRIPTION == "Industrial Parks not Developed" || d.LAND_USE_DESCRIPTION == "Public & Semi-Public Vacant" || d.LAND_USE_DESCRIPTION == "Agriculture" || d.LAND_USE_DESCRIPTION == "Park, Recreational or Preserve" || d.LAND_USE_DESCRIPTION == "Golf Course" || d.LAND_USE_DESCRIPTION == "Undeveloped Land" || d.LAND_USE_DESCRIPTION == "Open Water");  })
+  var landData = dataLand.filter(function(d){ return d.CTU_NAME == city && (d.LAND_USE_DESCRIPTION != "Non-Urbanized" && d.LAND_USE_DESCRIPTION != "Institutional and Recreation" && d.LAND_USE_DESCRIPTION != "Open Water Bodies" && d.LAND_USE_DESCRIPTION != "Parks & Recreation Areas" && d.LAND_USE_DESCRIPTION != "Vacant/Agricultural" && d.LAND_USE_DESCRIPTION != "Industrial Parks not Developed" && d.LAND_USE_DESCRIPTION != "Public & Semi-Public Vacant" && d.LAND_USE_DESCRIPTION != "Agriculture" && d.LAND_USE_DESCRIPTION != "Park, Recreational or Preserve" && d.LAND_USE_DESCRIPTION != "Golf Course" && d.LAND_USE_DESCRIPTION != "Undeveloped Land" && d.LAND_USE_DESCRIPTION != "Open Water");  })
 
-  var landuse = ["Undeveloped Acres", 0,0,0,0,0];
+  var landuse = ["Developed Acres", 0,0,0,0,0];
   var landYears = ["x",1970,1980,1990,2000,2010];
 
   var indexThis = 1;
@@ -790,7 +797,8 @@ if (dataType == "land"){
   if (pctChange < 0) { $("#landChange").addClass("neg"); }
   else if (pctChange > 0) { $("#landChange").addClass("pos"); }
 
-  $("#landChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#landChange").html(d3.format("+%")(pctChange)); }
+  else { $("#landChange").html("--"); }
 
   if (values == "land") { return landuse; }
   else if (values == "years") { return landYears; }
@@ -821,7 +829,8 @@ if (dataType == "population"){
   if (pctChange < 0) { $("#populationChange").addClass("neg"); }
   else if (pctChange > 0) { $("#populationChange").addClass("pos"); }
 
-  $("#populationChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#populationChange").html(d3.format("+%")(pctChange)); }
+  else { $("#populationChange").html("--"); }
 
   if (values == "population") { return populations; }
   else if (values == "years") { return years; }
@@ -851,7 +860,8 @@ if (dataType == "income"){
   if (pctChange < 0) { $("#incomeChange").addClass("neg"); }
   else if (pctChange > 0) { $("#incomeChange").addClass("pos"); }
 
-  $("#incomeChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#incomeChange").html(d3.format("+%")(pctChange)); }
+  else { $("#incomeChange").html("--"); }
 
   if (values == "income") { return income; }
   else if (values == "years") { return incomeYears; }
@@ -879,7 +889,8 @@ if (dataType == "poverty"){
   if (pctChange < 0) { $("#povertyChange").addClass("neg"); }
   else if (pctChange > 0) { $("#povertyChange").addClass("pos"); }
 
-  $("#povertyChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#povertyChange").html(d3.format("+%")(pctChange)); }
+  else { $("#povertyChange").html("--"); }
 
   if (values == "poverty") { return poverty; }
   else if (values == "years") { return povYears; }
@@ -907,7 +918,8 @@ if (dataType == "degrees"){
   if (pctChange < 0) { $("#degreesChange").addClass("neg"); }
   else if (pctChange > 0) { $("#degreesChange").addClass("pos"); }
 
-  $("#degreesChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#degreesChange").html(d3.format("+%")(pctChange)); }
+  else { $("#degreesChange").html("--"); }
 
   if (values == "degrees") { return degrees; }
   else if (values == "years") { return degreeYears; }
@@ -935,16 +947,17 @@ if (dataType == "race"){
   if (pctChange < 0) { $("#raceChange").addClass("neg"); }
   else if (pctChange > 0) { $("#raceChange").addClass("pos"); }
 
-  $("#raceChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#raceChange").html(d3.format("+%")(pctChange)); }
+  else { $("#raceChange").html("--"); }
 
   if (values == "race") { return minorities; }
   else if (values == "years") { return raceYears; }
 }
 
 if (dataType == "land"){
-  var landData = dataCountiesLand.filter(function(d){ return d.CO_NAME == city && (d.LAND_USE_DESCRIPTION == "Non-Urbanized" || d.LAND_USE_DESCRIPTION == "Institutional and Recreation" || d.LAND_USE_DESCRIPTION == "Open Water Bodies" || d.LAND_USE_DESCRIPTION == "Parks & Recreation Areas" || d.LAND_USE_DESCRIPTION == "Vacant/Agricultural" || d.LAND_USE_DESCRIPTION == "Industrial Parks not Developed" || d.LAND_USE_DESCRIPTION == "Public & Semi-Public Vacant" || d.LAND_USE_DESCRIPTION == "Agriculture" || d.LAND_USE_DESCRIPTION == "Park, Recreational or Preserve" || d.LAND_USE_DESCRIPTION == "Golf Course" || d.LAND_USE_DESCRIPTION == "Undeveloped Land" || d.LAND_USE_DESCRIPTION == "Open Water");  })
+  var landData = dataCountiesLand.filter(function(d){ return d.CO_NAME == city && (d.LAND_USE_DESCRIPTION != "Non-Urbanized" && d.LAND_USE_DESCRIPTION != "Institutional and Recreation" && d.LAND_USE_DESCRIPTION != "Open Water Bodies" && d.LAND_USE_DESCRIPTION != "Parks & Recreation Areas" && d.LAND_USE_DESCRIPTION != "Vacant/Agricultural" && d.LAND_USE_DESCRIPTION != "Industrial Parks not Developed" && d.LAND_USE_DESCRIPTION != "Public & Semi-Public Vacant" && d.LAND_USE_DESCRIPTION != "Agriculture" && d.LAND_USE_DESCRIPTION != "Park, Recreational or Preserve" && d.LAND_USE_DESCRIPTION != "Golf Course" && d.LAND_USE_DESCRIPTION != "Undeveloped Land" && d.LAND_USE_DESCRIPTION != "Open Water");  })
 
-  var landuse = ["Undeveloped Acres", 0,0,0,0,0];
+  var landuse = ["Developed Acres", 0,0,0,0,0];
   var landYears = ["x",1970,1980,1990,2000,2010];
 
   var indexThis = 1;
@@ -965,7 +978,8 @@ if (dataType == "land"){
   if (pctChange < 0) { $("#landChange").addClass("neg"); }
   else if (pctChange > 0) { $("#landChange").addClass("pos"); }
 
-  $("#landChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#landChange").html(d3.format("+%")(pctChange)); }
+  else { $("#landChange").html("--"); }
 
   if (values == "land") { return landuse; }
   else if (values == "years") { return landYears; }
@@ -996,7 +1010,8 @@ if (dataType == "population"){
   if (pctChange < 0) { $("#populationChange").addClass("neg"); }
   else if (pctChange > 0) { $("#populationChange").addClass("pos"); }
 
-  $("#populationChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#populationChange").html(d3.format("+%")(pctChange)); }
+  else { $("#populationChange").html("--"); }
 
   if (values == "population") { return populations; }
   else if (values == "years") { return years; }
@@ -1025,7 +1040,8 @@ if (dataType == "income"){
   if (pctChange < 0) { $("#incomeChange").addClass("neg"); }
   else if (pctChange > 0) { $("#incomeChange").addClass("pos"); }
 
-  $("#incomeChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#incomeChange").html(d3.format("+%")(pctChange)); }
+  else { $("#incomeChange").html("--"); }
 
   if (values == "income") { return income; }
   else if (values == "years") { return incomeYears; }
@@ -1053,7 +1069,8 @@ if (dataType == "poverty"){
   if (pctChange < 0) { $("#povertyChange").addClass("neg"); }
   else if (pctChange > 0) { $("#povertyChange").addClass("pos"); }
 
-  $("#povertyChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#povertyChange").html(d3.format("+%")(pctChange)); }
+  else { $("#povertyChange").html("--"); }
 
   if (values == "poverty") { return poverty; }
   else if (values == "years") { return povYears; }
@@ -1081,7 +1098,8 @@ if (dataType == "degrees"){
   if (pctChange < 0) { $("#degreesChange").addClass("neg"); }
   else if (pctChange > 0) { $("#degreesChange").addClass("pos"); }
 
-  $("#degreesChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#degreesChange").html(d3.format("+%")(pctChange)); }
+  else { $("#degreesChange").html("--"); }
 
   if (values == "degrees") { return degrees; }
   else if (values == "years") { return degreeYears; }
@@ -1109,17 +1127,17 @@ if (dataType == "race"){
   if (pctChange < 0) { $("#raceChange").addClass("neg"); }
   else if (pctChange > 0) { $("#raceChange").addClass("pos"); }
 
-
-  $("#raceChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#raceChange").html(d3.format("+%")(pctChange)); }
+  else { $("#raceChange").html("--"); }
 
   if (values == "race") { return minorities; }
   else if (values == "years") { return raceYears; }
 }
 
 if (dataType == "land"){
-  var landData = dataAllLand.filter(function(d){ return d.REGION_NAME == city && (d.LAND_USE_DESCRIPTION == "Non-Urbanized" || d.LAND_USE_DESCRIPTION == "Institutional and Recreation" || d.LAND_USE_DESCRIPTION == "Open Water Bodies" || d.LAND_USE_DESCRIPTION == "Parks & Recreation Areas" || d.LAND_USE_DESCRIPTION == "Vacant/Agricultural" || d.LAND_USE_DESCRIPTION == "Industrial Parks not Developed" || d.LAND_USE_DESCRIPTION == "Public & Semi-Public Vacant" || d.LAND_USE_DESCRIPTION == "Agriculture" || d.LAND_USE_DESCRIPTION == "Park, Recreational or Preserve" || d.LAND_USE_DESCRIPTION == "Golf Course" || d.LAND_USE_DESCRIPTION == "Undeveloped Land" || d.LAND_USE_DESCRIPTION == "Open Water");  })
+  var landData = dataAllLand.filter(function(d){ return d.REGION_NAME == city && (d.LAND_USE_DESCRIPTION != "Non-Urbanized" && d.LAND_USE_DESCRIPTION != "Institutional and Recreation" && d.LAND_USE_DESCRIPTION != "Open Water Bodies" && d.LAND_USE_DESCRIPTION != "Parks & Recreation Areas" && d.LAND_USE_DESCRIPTION != "Vacant/Agricultural" && d.LAND_USE_DESCRIPTION != "Industrial Parks not Developed" && d.LAND_USE_DESCRIPTION != "Public & Semi-Public Vacant" && d.LAND_USE_DESCRIPTION != "Agriculture" && d.LAND_USE_DESCRIPTION != "Park, Recreational or Preserve" && d.LAND_USE_DESCRIPTION != "Golf Course" && d.LAND_USE_DESCRIPTION != "Undeveloped Land" && d.LAND_USE_DESCRIPTION != "Open Water");  })
 
-  var landuse = ["Undeveloped Acres", 0,0,0,0,0];
+  var landuse = ["Developed Acres", 0,0,0,0,0];
   var landYears = ["x",1970,1980,1990,2000,2010];
 
   var indexThis = 1;
@@ -1140,7 +1158,8 @@ if (dataType == "land"){
   if (pctChange < 0) { $("#landChange").addClass("neg"); }
   else if (pctChange > 0) { $("#landChange").addClass("pos"); }
 
-  $("#landChange").html(d3.format("+%")(pctChange));
+  if (isFinite(pctChange)) { $("#landChange").html(d3.format("+%")(pctChange)); }
+  else { $("#landChange").html("--"); }
 
   if (values == "land") { return landuse; }
   else if (values == "years") { return landYears; }
@@ -1152,110 +1171,57 @@ if (dataType == "land"){
 //mapbox://styles/mapbox/dark-v9
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZG93ZmxhcmUiLCJhIjoiS3pwY1JTMCJ9.pTSXx_LFgR3XBpCNNxWPKA';
-var mapStyle = {
-    "version": 8,
-    "name": "Dark",
-    "sources": {
-        "mapbox": {
-            "type": "vector",
-            "url": "mapbox://mapbox.mapbox-streets-v6"
-        },
-        "overlay": {
-            "type": "image",
-            "url": "./data/metro1966.png",
-            "coordinates": [
-                [-93.35296721774532,45.12774071853477],
-                [-92.97801967540039,45.12762157010823],
-                [-92.97664527671149,44.85745467286256],
-                [-93.35728758338274,44.85778181806326]
-            ]
-        }
-    },
-    "sprite": "mapbox://sprites/mapbox/streets-v9",
-    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-    "layers": [
-        {
-            "id": "background",
-            "type": "background",
-            "paint": {"background-color": "#46611c"}
-        },
-        {
-            "id": "water",
-            "source": "mapbox",
-            "source-layer": "water",
-            "type": "fill",
-            "paint": {"fill-color": "#2c2c2c"}
-        },
-        {
-            "id": "boundaries",
-            "source": "mapbox",
-            "source-layer": "admin",
-            "type": "line",
-            "paint": {"line-color": "#797979", "line-dasharray": [2, 2, 6, 2]},
-            "filter": ["all", ["==", "maritime", 0]]
-        },
-        {
-            "id": "overlay",
-            "source": "overlay",
-            "type": "raster",
-            "paint": {"raster-opacity": 1}
-        },
-        {
-            "id": "cities",
-            "source": "mapbox",
-            "source-layer": "place_label",
-            "type": "symbol",
-            "layout": {
-                "text-field": "{name_en}",
-                "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
-                "text-size": {"stops": [[4, 9], [6, 12]]}
-            },
-            "paint": {
-                "text-opacity": 0,
-                "text-color": "#969696",
-                "text-halo-width": 2,
-                "text-halo-color": "rgba(0, 0, 0, 0.85)"
-            }
-        },
-        {
-            "id": "states",
-            "source": "mapbox",
-            "source-layer": "state_label",
-            "type": "symbol",
-            "layout": {
-                "text-transform": "uppercase",
-                "text-field": "{name_en}",
-                "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
-                "text-letter-spacing": 0.15,
-                "text-max-width": 7,
-                "text-size": {"stops": [[4, 10], [6, 14]]}
-            },
-            "filter": [">=", "area", 80000],
-            "paint": {
-                "text-color": "#969696",
-                "text-halo-width": 2,
-                "text-halo-color": "rgba(0, 0, 0, 0.85)"
-            }
-        }
-    ]
-};
 
 //'mapbox://styles/mapbox/satellite-v9'
 
 var beforeMap = new mapboxgl.Map({
     container: 'before', // container id
-    style: mapStyle,
+    style: 'mapbox://styles/shadowflare/ciqzo0bu20004bknkbrhrm6wf',
     center: [-93.28469849, 45.01832962], 
-    zoom: 7,
+    zoom: 8,
     minZoom: 3,
     hash: false
 });
 
+beforeMap.addControl(new mapboxgl.NavigationControl());
+beforeMap.scrollZoom.disable();
+
+beforeMap.on('load', function() {
+
+ beforeMap.addSource('metro1970', {
+   type: 'geojson',
+   data: population1970
+ });
+
+  beforeMap.addLayer({
+       'id': 'old-layer',
+       'interactive': true,
+       'source': 'metro1970',
+       'layout': {},
+       'type': 'fill',
+            'paint': {
+           'fill-antialias' : true,
+           'fill-opacity': 1,
+           'fill-color': {
+            "property": "DENSITY",
+            "stops": [
+              [0, "#f1eef6"],
+              [20, "#bdc9e1"],
+              [40, "#74a9cf"],
+              [80, "#0570b0"]
+           ]
+        },
+           'fill-outline-color': 'rgba(255, 255, 255, 0.1)'
+     }
+   }, 'place-neighbourhood');
+
+});
+
 var map = new mapboxgl.Map({
     container: 'after', // container id
-    style: 'mapbox://styles/mapbox/satellite-v9',
+    style: 'mapbox://styles/shadowflare/ciqzo0bu20004bknkbrhrm6wf',
     center: [-93.28469849, 45.01832962], 
-    zoom: 7,
+    zoom: 8,
     minZoom: 3
 });
 
@@ -1267,68 +1233,70 @@ var mapBoth = new mapboxgl.Compare(beforeMap, map, {
 map.addControl(new mapboxgl.NavigationControl());
 map.scrollZoom.disable();
 
-// map.addControl(new MapboxGeocoder({
-//     accessToken: mapboxgl.accessToken
-// }));
 
-$('.onoffswitch :checkbox').change(function() {  
-    if (this.checked) { 
-      map.setStyle('mapbox://styles/mapbox/satellite-streets-v9');
-    }
-    else {
-      map.setStyle(mapStyle);
-    }
-});
-
-
-// http://gis.uspatial.umn.edu/arcgis/rest/services/Libraries/MSPAerialMosaic_1966/MapServer
+//http://gis.uspatial.umn.edu/arcgis/rest/services/Libraries/MSPAerialMosaic_1966/MapServer
 map.on('load', function() {
-    // map.addLayer({
-    //     'id': 'wms-test-layer',
-    //     'type': 'raster',
-    //     'source': {
-    //         'type': 'raster',
-    //         'tiles': [
-    //           // 'http://gis.uspatial.umn.edu/arcgis/services/Libraries/MSPAerialMosaic_1966/MapServer/WmsServer?f=json'
-    //             'http://gis.uspatial.umn.edu/arcgis/rest/services/Libraries/MSPAerialMosaic_1966/MapServer/export?bbox=-1.0412200566135872E7%2C5613504.6509575825%2C-1.0330294195295427E7%2C5642634.531800417&bboxSR=&layers=&layerDefs=&size=1000%2C1000&imageSR=&format=png&transparent=true&dpi=1000&time=&layerTimeOptions=&dynamicLayers=&gdbVersion=&mapScale=&f=image'
-    //         ],
-    //         'tileSize': 256
-    //     },
-    //     'paint': {}
-    // });
 
- map.addSource('metro', {
+ map.addSource('metroToday', {
    type: 'geojson',
-   data: metro
+   data: population
  });
 
-map.addLayer({
-     'id': 'metro-layer',
-     'interactive': true,
-     'source': 'metro',
-     'layout': {},
-     'type': 'fill',
-          'paint': {
-         'fill-antialias': true,
-         'fill-opacity': 0.2,
-         'fill-color': "#333333",
-         'fill-outline-color': 'rgba(255, 255, 255, 1)'
-   }
- });
+  map.addLayer({
+       'id': 'new-layer',
+       'interactive': true,
+       'source': 'metroToday',
+       'layout': {},
+       'type': 'fill',
+            'paint': {
+           'fill-antialias' : true,
+           'fill-opacity': 1,
+           'fill-color': {
+            "property": "DENSITY",
+            "stops": [
+              [0, "#f1eef6"],
+              [20, "#bdc9e1"],
+              [40, "#74a9cf"],
+              [80, "#0570b0"]
+           ]
+        },
+           'fill-outline-color': 'rgba(255, 255, 255, 0.1)'
+     }
+   }, 'place-neighbourhood');
+
+
+   map.addSource('metro', {
+     type: 'geojson',
+     data: metro
+   });
+
+    map.addLayer({
+         'id': 'metro-layer',
+         'interactive': true,
+         'source': 'metro',
+         'layout': {},
+         'type': 'fill',
+              'paint': {
+             'fill-antialias': true,
+             'fill-opacity': 0,
+             'fill-color': "#dddddd",
+             'fill-outline-color': 'rgba(255, 255, 255, 1)'
+       }
+     }, 'place-neighbourhood');
 
 });
 
     $("#first").trigger("mousedown");
 
     $("#population").html("3,005,419");
-    $("#land").html("1,328,847");
+    $("#land").html("575,447");
     $("#income").html("$68,778");
     $("#minorities").html("11%");
     $("#poverty").html("25%");
     $("#degrees").html("27%");
 
     $("#populationChange").html("+60%");
-    $("#landChange").html("-19%");
+    $("#landChange").html("+111%");
     $("#incomeChange").html("+88%");
     $("#raceChange").html("+16%");
     $("#povertyChange").html("+3%");
@@ -1349,4 +1317,157 @@ map.addLayer({
 });
 });
 });
+} else if (selected == "satellite"){
+
+// mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZG93ZmxhcmUiLCJhIjoiS3pwY1JTMCJ9.pTSXx_LFgR3XBpCNNxWPKA';
+
+// var mapStyle = {
+//     "version": 8,
+//     "name": "Dark",
+//     "sources": {
+//         "mapbox": {
+//             "type": "vector",
+//             "url": "mapbox://mapbox.mapbox-streets-v6"
+//         },
+//         "overlay": {
+//             "type": "image",
+//             "url": "./data/metro_full.png",
+//             "coordinates": [
+//               [-94.01979344400419,45.40017445724881],
+//               [-92.631226,45.392664],
+//               [-92.631226,44.476911],
+//               [-94.03004054510949,44.44933241738372] 
+                
+                
+//                 // [-93.35296721774532,45.12774071853477],
+//                 // [-92.97801967540039,45.12762157010823],
+//                 // [-92.97664527671149,44.85745467286256],
+//                 // [-93.35728758338274,44.85778181806326]
+//             ]
+//         }
+//     },
+//     "sprite": "mapbox://sprites/mapbox/streets-v9",
+//     "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+//     "layers": [
+//         {
+//             "id": "background",
+//             "type": "background",
+//             "paint": {"background-color": "#aaaaaa"}
+//         },
+//         {
+//             "id": "water",
+//             "source": "mapbox",
+//             "source-layer": "water",
+//             "type": "fill",
+//             "paint": {"fill-color": "#2c2c2c"}
+//         },
+//         {
+//             "id": "boundaries",
+//             "source": "mapbox",
+//             "source-layer": "admin",
+//             "type": "line",
+//             "paint": {"line-color": "#797979", "line-dasharray": [2, 2, 6, 2]},
+//             "filter": ["all", ["==", "maritime", 0]]
+//         },
+//         {
+//             "id": "overlay",
+//             "source": "overlay",
+//             "type": "raster",
+//             "paint": {"raster-opacity": 1}
+//         },
+//         {
+//             "id": "cities",
+//             "source": "mapbox",
+//             "source-layer": "place_label",
+//             "type": "symbol",
+//             "layout": {
+//                 "text-field": "{name_en}",
+//                 "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
+//                 "text-size": {"stops": [[4, 9], [6, 12]]}
+//             },
+//             "paint": {
+//                 "text-opacity": 0,
+//                 "text-color": "#969696",
+//                 "text-halo-width": 2,
+//                 "text-halo-color": "rgba(0, 0, 0, 0.85)"
+//             }
+//         },
+//         {
+//             "id": "states",
+//             "source": "mapbox",
+//             "source-layer": "state_label",
+//             "type": "symbol",
+//             "layout": {
+//                 "text-transform": "uppercase",
+//                 "text-field": "{name_en}",
+//                 "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"],
+//                 "text-letter-spacing": 0.15,
+//                 "text-max-width": 7,
+//                 "text-size": {"stops": [[4, 10], [6, 14]]}
+//             },
+//             "filter": [">=", "area", 80000],
+//             "paint": {
+//                 "text-color": "#969696",
+//                 "text-halo-width": 2,
+//                 "text-halo-color": "rgba(0, 0, 0, 0.85)"
+//             }
+//         }
+//     ]
+// };
+
+//'mapbox://styles/mapbox/satellite-v9'
+
+// var bounds = [
+//     [-93.35296721774532,45.12774071853477], // Southwest coordinates
+//     [-92.97664527671149,44.85745467286256]  // Northeast coordinates
+// ];
+
+// var beforeMap = new mapboxgl.Map({
+//     container: 'old',
+//     style: mapStyle,
+//     center: [-93.170242, 45.012116], 
+//     zoom: 9,
+//     minZoom: 5,
+//     hash: false,
+//     // maxBounds: bounds
+// });
+
+// beforeMap.addControl(new mapboxgl.NavigationControl());
+// beforeMap.scrollZoom.disable();
+
+// beforeMap.on('load', function() {
+//     map.addLayer({
+//         'id': 'wms-test-layer',
+//         'type': 'raster',
+//         'source': {
+//             'type': 'raster',
+//             'tiles': [
+
+//               // 'http://gis.uspatial.umn.edu/arcgis/services/Libraries/MSPAerialMosaic_1966/MapServer/WmsServer?f=json'
+//                 // 'https://tgis2.uspatial.umn.edu/arcgis/services/Libraries/MetroAerialMosaic_1966/MapServer/WMSServer?request=GetMap&service=WMS&bbox={bbox-epsg-4326}&format=image/png&version=1.3.0&srs=EPSG:4326&width=256&height=256&layers=0,1,2,3'
+//             ],
+//             'tileSize': 256
+//         },
+//         'paint': {}
+//     });
+//   });
+
+// var map = new mapboxgl.Map({
+//     container: 'current',
+//     style: 'mapbox://styles/mapbox/satellite-streets-v9',
+//     center: [-93.170242, 45.012116], 
+//     zoom: 9,
+//     minZoom: 5,
+//     hash:false,
+//     // maxBounds: bounds
+// });
+
+// var mapBoth = new mapboxgl.Compare(beforeMap, map, {
+
+// });
+
+// map.addControl(new mapboxgl.NavigationControl());
+// map.scrollZoom.disable();
+
+}
 },{}]},{},[1])
